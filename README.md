@@ -24,11 +24,11 @@ Additionally, the chatbot has the capability to store relevant information in a 
 
 ![image](https://github.com/FedeMaguire/FedeMaguire-Whatsapp-ChatGPT-Chatbot/blob/main/screenshots/openai%20api.jpg?raw=true)
  
- # Valid API key for connecting to WhatsApp via Meta, using the Flask library to create a local server and Ngrok as a web server.
+ # Valid API key for connecting to WhatsApp via Meta.
  
 ![image](https://github.com/FedeMaguire/FedeMaguire-Whatsapp-ChatGPT-Chatbot/blob/main/screenshots/token.jpg?raw=true)
 
- # Ngrok server and webhook.
+ # Ngrok server and webhook, using the Flask library to create a local server and Ngrok as a web server.
 
 ![image](https://github.com/FedeMaguire/FedeMaguire-Whatsapp-ChatGPT-Chatbot/blob/main/screenshots/ngrok.jpg?raw=true)
 
