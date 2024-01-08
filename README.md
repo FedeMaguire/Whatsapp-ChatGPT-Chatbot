@@ -1,7 +1,7 @@
-# :robot::speech_balloon: WhatsApp Chatbot with ChatGPT API Integration and Database storage
+# :robot::speech_balloon: WhatsApp Chatbot with ChatGPT's API Integration and Database storage
 ![image](https://github.com/FedeMaguire/Whatsapp-ChatGPT-Chatbot/blob/main/screenshots/Screenshot%202023-11-27%20152443.jpg?raw=true)
 # Overview
-### A WhatsApp chatbot that leverages the ChatGPT API, utilizing tailored 'system' instructions to suit specific business needs. The code uses OpenAI's API, employing the 'gpt-3.5-turbo-instruct' language model to generate responses based on information provided in the 'system' instructions.
+### A WhatsApp chatbot that leverages ChatGPT's API, utilizing tailored 'system' instructions to suit specific business needs. The code uses OpenAI's API, employing the 'gpt-3.5-turbo-instruct' language model to generate responses based on information provided in the 'system' instructions.
 ### Additionally, the chatbot has the capability to store relevant information in a database for future reference and data analysis.
 
 *This chatbot was fully written in spanish for a business located in Argentina.*
