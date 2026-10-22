@@ -1,5 +1,7 @@
 #Receive WhatsApp message and Generate a Response with ChatGPT
+import os
 import openai
+import mysql.connector
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
@@ -10,7 +12,7 @@ def webhook_whatsapp():
     #IF DATA RECEIVED VIA GET
     if request.method == "GET":
         #IF OKEN MATCHES TOKEN RECEIVED
-        if request.args.get('hub.verify_token') == "my token": # TOKEN == META TOKEN
+        if request.args.get('hub.verify_token') == os.environ["WEBHOOK_VERIFY_TOKEN"]: # TOKEN == META TOKEN
             #ENTER CHALLENGE VALUE RECEIVED FROM FACEBOOK IN BROWSER
             return request.args.get('hub.challenge')
         else:
@@ -32,7 +34,7 @@ def webhook_whatsapp():
     if mensaje is not None:
 
         # OpenAI API Key
-        openai.api_key = "#############################################"
+        openai.api_key = os.environ["OPENAI_API_KEY"]
         # ChatGPT in Python
         model_engine = "gpt-3.5-turbo-instruct"
 
@@ -86,36 +88,34 @@ Estamos en Capitán J. G. de Bermudez 3457 Olivos, de Lunes a Jueves de 9 a 16hs
         respuesta=respuesta.replace("\\n","\\\n")
         respuesta=respuesta.replace("\\","")
         #Connect to database
-        import mysql.connector
         mydb = mysql.connector.connect(
-          host = "localhost",
-          user = "root",
-          password = "",
-          database='chatBot test'
+          host = os.environ.get("DB_HOST", "localhost"),
+          user = os.environ["DB_USER"],
+          password = os.environ["DB_PASSWORD"],
+          database = os.environ["DB_NAME"]
         )
         mycursor = mydb.cursor()
-        query="SELECT count(id) AS cantidad FROM registro WHERE id_wa='" + idWA + "';"
-        mycursor.execute(query)
-
+        #PARAMETERIZED QUERIES: VALUES ARE PASSED SEPARATELY, NEVER CONCATENATED INTO THE SQL
+        mycursor.execute("SELECT COUNT(id) FROM registro WHERE id_wa = %s", (idWA,))
         cantidad, = mycursor.fetchone()
-        cantidad=str(cantidad)
-        cantidad=int(cantidad)
-        if cantidad==0 :
-            sql = ("INSERT INTO registro"+ 
-            "(mensaje_recibido,mensaje_enviado,id_wa      ,timestamp_wa   ,telefono_wa) VALUES "+
-            "('"+mensaje+"'   ,'"+respuesta+"','"+idWA+"' ,'"+timestamp+"','"+telefonoCliente+"');")
-            mycursor.execute(sql)
+        if cantidad == 0:
+            sql = ("INSERT INTO registro "
+                   "(mensaje_recibido, mensaje_enviado, id_wa, timestamp_wa, telefono_wa) "
+                   "VALUES (%s, %s, %s, %s, %s)")
+            mycursor.execute(sql, (mensaje, respuesta, idWA, timestamp, telefonoCliente))
             mydb.commit()
             enviar(telefonoCliente,respuesta)
+        mycursor.close()
+        mydb.close()
         #Return Json status
         return jsonify({"status": "success"}, 200)
     
 def enviar(telefonoRecibe,respuesta):
   from heyoo import WhatsApp
   #Facebook access from META
-  token='#####################################################'
+  token=os.environ["WHATSAPP_TOKEN"]
   #Telephone number identifier
-  idNumeroTeléfono='156646180865098'
+  idNumeroTeléfono=os.environ["WHATSAPP_PHONE_ID"]
  #STARTING MESSAGE SENDING
   mensajeWa=WhatsApp(token,idNumeroTeléfono)
   telefonoRecibe=telefonoRecibe.replace("549","54")
@@ -123,4 +123,4 @@ def enviar(telefonoRecibe,respuesta):
   mensajeWa.send_message(respuesta,telefonoRecibe)
 #STARTING FLASK
 if __name__ == "__main__":
-  app.run(debug=True)
+  app.run(debug=False)
