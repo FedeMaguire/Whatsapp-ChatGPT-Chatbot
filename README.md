@@ -1,39 +1,76 @@
-# :robot::speech_balloon: WhatsApp Chatbot with ChatGPT's API Integration and Database storage
-![image](https://github.com/FedeMaguire/Whatsapp-ChatGPT-Chatbot/blob/main/screenshots/Screenshot%202023-11-27%20152443.jpg?raw=true)
-# Overview
-### A WhatsApp chatbot that leverages ChatGPT's API, utilizing tailored 'system' instructions to suit specific business needs. The code uses OpenAI's API, employing the 'gpt-3.5-turbo-instruct' language model to generate responses based on information provided in the 'system' instructions.
-### Additionally, the chatbot has the capability to store relevant information in a database for future reference and data analysis.
+# :robot::speech_balloon: WhatsApp Chatbot with ChatGPT API Integration and Database Storage
 
-*This chatbot was fully written in spanish for a business located in Argentina.*
+![WhatsApp chatbot conversation](https://github.com/FedeMaguire/Whatsapp-ChatGPT-Chatbot/blob/main/screenshots/Screenshot%202023-11-27%20152443.jpg?raw=true)
 
-![image](https://github.com/FedeMaguire/FedeMaguire-Whatsapp-ChatGPT-Chatbot/blob/main/screenshots/whatsapp%20chat.jpg?raw=true)
+## Overview
 
+A customer-service chatbot for WhatsApp, built in 2023 as a paid project for **VideoNorte**, a business in Buenos Aires, Argentina, that converts old video and audio formats to digital.
 
-**Please note that this chatbot is intended for testing purposes and is built using free APIs with limited run time. For commercial use, API fees will need to be paid.**
+The bot answers customer questions about services, prices, and opening hours. It uses OpenAI's API with business-specific system instructions, so replies stay within the information the business provided. Every incoming message and the bot's reply are stored in a MySQL database for later reference and analysis.
 
-# Libraries
+*The bot's instructions and replies are written in Spanish.*
 
-- pip install openai
-- pip install Flask
-- pip install jsonify
-- pip install requests
-- pip install mysql-connector-python
-- pip install heyoo
+![WhatsApp chat example](https://github.com/FedeMaguire/Whatsapp-ChatGPT-Chatbot/blob/main/screenshots/whatsapp%20chat.jpg?raw=true)
 
- # Prerequisites
+## How it works
 
-# Valid API key for OpenAI's API.
+1. A customer sends a WhatsApp message to the business number.
+2. Meta's WhatsApp Cloud API forwards it to a Flask webhook.
+3. The bot sends the message to OpenAI's API together with the business's system instructions.
+4. The message, the reply, the WhatsApp message ID, the timestamp, and the customer's phone number are saved in MySQL. The message ID check prevents answering the same message twice.
+5. The reply is sent back to the customer through the WhatsApp Cloud API.
 
-![image](https://github.com/FedeMaguire/FedeMaguire-Whatsapp-ChatGPT-Chatbot/blob/main/screenshots/openai%20api.jpg?raw=true)
- 
- # Valid API key for connecting to WhatsApp via Meta.
- 
-![image](https://github.com/FedeMaguire/FedeMaguire-Whatsapp-ChatGPT-Chatbot/blob/main/screenshots/token.jpg?raw=true)
+## Tech stack
 
- # Ngrok server and webhook, using the Flask library to create a local server and Ngrok as a web server.
+- **Python** with **Flask** (webhook server)
+- **OpenAI API** (`gpt-3.5-turbo-instruct`)
+- **WhatsApp Cloud API** (Meta), using the `heyoo` library
+- **MySQL** (`mysql-connector-python`); the table schema is in `Database_queries.sql`
+- **ngrok** to expose the local Flask server to Meta's webhook during development
 
-![image](https://github.com/FedeMaguire/FedeMaguire-Whatsapp-ChatGPT-Chatbot/blob/main/screenshots/ngrok.jpg?raw=true)
+## Setup
 
-![image](https://github.com/FedeMaguire/FedeMaguire-Whatsapp-ChatGPT-Chatbot/blob/main/screenshots/url%20devolucion.jpg?raw=true)
+### Libraries
 
-# Feel free to use this version or make any further adjustments to better suit your preferences or specific project details.
+```
+pip install openai Flask requests mysql-connector-python heyoo
+```
+
+### Prerequisites
+
+**1. An OpenAI API key**
+
+![OpenAI API key](https://github.com/FedeMaguire/Whatsapp-ChatGPT-Chatbot/blob/main/screenshots/openai%20api.jpg?raw=true)
+
+**2. A WhatsApp Cloud API token from Meta**
+
+![Meta token](https://github.com/FedeMaguire/Whatsapp-ChatGPT-Chatbot/blob/main/screenshots/token.jpg?raw=true)
+
+**3. A public webhook URL.** For development, Flask runs a local server and ngrok exposes it to Meta.
+
+![ngrok](https://github.com/FedeMaguire/Whatsapp-ChatGPT-Chatbot/blob/main/screenshots/ngrok.jpg?raw=true)
+
+![Webhook URL](https://github.com/FedeMaguire/Whatsapp-ChatGPT-Chatbot/blob/main/screenshots/url%20devolucion.jpg?raw=true)
+
+**4. A MySQL database** created from `Database_queries.sql`.
+
+### Configuration
+
+API keys and database credentials are read from environment variables, so no secrets are stored in the code:
+
+```
+OPENAI_API_KEY=...
+WHATSAPP_TOKEN=...
+WHATSAPP_PHONE_ID=...
+WEBHOOK_VERIFY_TOKEN=...
+DB_HOST=localhost
+DB_USER=...
+DB_PASSWORD=...
+DB_NAME=...
+```
+
+## Notes
+
+- Running the bot requires paid OpenAI API usage and a WhatsApp Business account on Meta's platform. ngrok is only for development; a production deployment needs a hosted server with a permanent URL.
+- The code reflects the 2023 version of the OpenAI Python library (`openai.Completion`). Newer library versions use a different interface.
+- **2026 update:** credentials moved to environment variables, and database queries switched to parameterized statements.
